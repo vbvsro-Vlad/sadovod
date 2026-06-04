@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel="manifest" href="manifest.json">
+    <script>
+  // Регистрируем Service Worker, чтобы Chrome разрешил установку приложения
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sadovod/sw.js')
+      .then(() => console.log('Service Worker зарегистрирован!'))
+      .catch(err => console.log('Ошибка:', err));
+  }
+</script>
     <title>Садовод — лес продуктивности</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
