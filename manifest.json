@@ -11,6 +11,11 @@
       "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
       "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
