@@ -2,24 +2,38 @@
   "name": "Садовод",
   "short_name": "Садовод",
   "description": "Трекер задач, где дела растут как деревья",
+  "id": "/sadovod/",
   "start_url": "/sadovod/",
+  "scope": "/sadovod/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "theme_color": "#1a4d2a",
   "background_color": "#1a4d2a",
   "orientation": "portrait",
-  "scope": "/sadovod/",
   "icons": [
     {
       "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://emojis.slackmojis.com/emojis/images/1643514389/1352/seedling.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
