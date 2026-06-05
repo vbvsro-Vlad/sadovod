@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
     <script>
         if ('serviceWorker' in navigator) {
@@ -48,7 +50,6 @@
         footer{text-align:center;color:#c8e6c8;font-size:11px;margin-top:20px;}
         .progress-small{background:#e0d6c8;border-radius:10px;height:6px;width:100%;margin-top:6px;overflow:hidden;}
         .progress-small-fill{background:#4caf50;height:100%;width:0%;}
-        .badge{background:#ffd966;border-radius:20px;padding:2px 8px;margin-left:8px;font-size:11px;}
     </style>
 </head>
 <body>
@@ -96,12 +97,9 @@
         render();
     }
     
-    // Главное дело — первое НЕзавершённое дело с этапами > 1 (или любое не завершённое)
     function getMainTask() {
-        // сначала ищем незавершённое дело с этапами > 1
         let staged = tasks.find(t => !t.completed && t.stages > 1);
         if(staged) return staged;
-        // если нет, то любое незавершённое
         return tasks.find(t => !t.completed);
     }
     
@@ -154,7 +152,6 @@
         save();
         render();
         document.getElementById('newTaskName').value = '';
-        // сбрасываем количество этапов на 1 для следующего добавления
         selectedStages = 1;
         document.getElementById('stagesValue').innerText = '1';
     }
@@ -212,7 +209,6 @@
     
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     
-    // Управление счётчиком этапов
     document.getElementById('stagesMinus').onclick = () => {
         if(selectedStages > 1) {
             selectedStages--;
