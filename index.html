@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
+    <script async id="wepp-install-modal" src="https://cdn.jsdelivr.net/gh/ryxxn/pwa-install-prompt@main/index.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sadovod/sw.js')
@@ -13,7 +14,6 @@
                 .catch(err => console.log('Ошибка:', err));
         }
     </script>
-    <script async id="wepp-install-modal" src="https://cdn.jsdelivr.net/gh/ryxxn/pwa-install-prompt@main/index.js"></script>
     <title>Садовод — лес продуктивности</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
@@ -38,6 +38,7 @@
         .task-stages{font-size:12px;color:gray;margin-top:4px;}
         .task-actions{display:flex;gap:8px;align-items:center;}
         .task-water{background:#d4f0d4;border:none;padding:8px 16px;border-radius:30px;cursor:pointer;font-size:14px;font-weight:bold;}
+        .task-make-main{background:#fff0d4;border:none;padding:8px 12px;border-radius:30px;cursor:pointer;font-size:14px;}
         .task-delete{background:#ffe0e0;border:none;padding:8px 16px;border-radius:30px;cursor:pointer;font-size:14px;color:#c0392b;}
         
         .add-task{display:flex;flex-direction:column;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid #e0d6c8;}
@@ -98,6 +99,7 @@
         render();
     }
     
+    // Главное дело — первое НЕвыполненное дело (сначала с этапами > 1)
     function getMainTask() {
         let staged = tasks.find(t => !t.completed && t.stages > 1);
         if(staged) return staged;
@@ -120,6 +122,7 @@
         return 'Исполин';
     }
     
+    // Полить задачу
     function waterTask(taskId) {
         let t = tasks.find(t => t.id === taskId);
         if(t && !t.completed && t.current < t.stages) {
@@ -132,10 +135,27 @@
         }
     }
     
+    // Сделать дело главным
+    function setMainTask(taskId) {
+        // В этой версии главное дело определяется автоматически (первое невыполненное)
+        // Но мы можем "поднять" дело в начало списка, чтобы оно стало главным
+        let t = tasks.find(t => t.id === taskId);
+        if(t && !t.completed) {
+            // Перемещаем задачу в начало массива
+            tasks = [t, ...tasks.filter(t2 => t2.id !== taskId)];
+            save();
+            render();
+        }
+    }
+    
+    // Удалить задачу — ТОЛЬКО если выполнена
     function deleteTask(taskId) {
-        tasks = tasks.filter(t => t.id !== taskId);
-        save();
-        render();
+        let t = tasks.find(t => t.id === taskId);
+        if(t && t.completed) {
+            tasks = tasks.filter(t => t.id !== taskId);
+            save();
+            render();
+        }
     }
     
     function addTask(title, stages) {
@@ -185,16 +205,23 @@
             let icon = t.stages === 1 ? '🍃' : '🌳';
             let stagesText = t.stages === 1 ? 'Разовое дело' : `${t.current}/${t.stages} этапов (${progressPercent}%)`;
             
+            // Кнопка "Сделать главным" — только для невыполненных и если это не текущее главное дело
+            let showMakeMain = !isCompleted && mainTask && t.id !== mainTask.id;
+            
+            // Кнопка удаления — ТОЛЬКО для выполненных
+            let showDelete = isCompleted;
+            
             return `
                 <div class="task-item">
                     <div class="task-info">
-                        <div class="task-title ${isCompleted ? 'completed' : ''}">${icon} ${escapeHtml(t.title)}</div>
+                        <div class="task-title ${isCompleted ? 'completed' : ''}">${icon} ${escapeHtml(t.title)} ${t.id === mainTask?.id ? '⭐' : ''}</div>
                         <div class="task-stages">${stagesText}</div>
                         ${t.stages > 1 ? `<div class="progress-small"><div class="progress-small-fill" style="width:${progressPercent}%;"></div></div>` : ''}
                     </div>
                     <div class="task-actions">
                         ${!isCompleted ? `<button class="task-water" data-id="${t.id}">💧 Полить</button>` : `<span style="color:green;">✅ Готово</span>`}
-                        <button class="task-delete" data-id="${t.id}">🗑</button>
+                        ${showMakeMain ? `<button class="task-make-main" data-id="${t.id}">👑 Сделать главным</button>` : ''}
+                        ${showDelete ? `<button class="task-delete" data-id="${t.id}">🗑 Удалить</button>` : ''}
                     </div>
                 </div>
             `;
@@ -202,6 +229,9 @@
         
         document.querySelectorAll('.task-water').forEach(btn => {
             btn.addEventListener('click', (e) => { e.stopPropagation(); waterTask(parseInt(btn.dataset.id)); });
+        });
+        document.querySelectorAll('.task-make-main').forEach(btn => {
+            btn.addEventListener('click', (e) => { e.stopPropagation(); setMainTask(parseInt(btn.dataset.id)); });
         });
         document.querySelectorAll('.task-delete').forEach(btn => {
             btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTask(parseInt(btn.dataset.id)); });
